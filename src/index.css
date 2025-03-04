@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F0F4EF;
+  font-family: 'Roboto', sans-serif;
+}
+.highlight {
+  background-color: yellow;
+}
