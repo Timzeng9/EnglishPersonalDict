@@ -196,7 +196,6 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
                 <option value={200}>200</option>
               </select>
             </div>
-            
             </div>
 
             <div className="mt-4" style={{ overflowX: 'auto' }}> {/* 允许图表水平滚动 */}
