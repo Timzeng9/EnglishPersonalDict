@@ -7,7 +7,6 @@ interface DailyWordCountsDictionary {
   [key: string]: Array<string>; 
 }
 
-
 function App() {
   // localStorage.clear();
   const [wordData, setWordData] = useState({
