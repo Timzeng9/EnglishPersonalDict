@@ -24,7 +24,7 @@ function Root() {
 
   return (
     <React.StrictMode>
-      <BrowserRouter basename={REACT_APP_DEPLOY_ENV === 'pages' ? '/EnglishPersonalDict' : ''}>
+      <BrowserRouter basename={'/EnglishPersonalDict'}>
           <App />
       </BrowserRouter>
     </React.StrictMode>
