@@ -161,7 +161,6 @@ function App() {
         </div>
       </div>
 
-      {/* 内容区域*/}
       <div className="w-[80%] max-w-4/5 flex flex-col mb-8 mt-4 overflow-auto">
         <WordDefinition
           word={wordData.word}
