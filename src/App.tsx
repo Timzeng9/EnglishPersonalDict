@@ -174,27 +174,6 @@ function App() {
         </div>
       </div>
 
-      {/* <div className="mt-4 flex justify-center">
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-          onClick={handleSaveData}
-        >
-          Save Client Data
-        </button>
-        <input
-          type="file"
-          accept=".json"
-          onChange={handleLoadData}
-          className="hidden"
-          ref={fileInputRef}
-        />
-        <button
-          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mr-2"
-          onClick={triggerFileInput}
-        >
-          选择文件
-        </button>
-      </div> */}
     </div>
   );
 }
