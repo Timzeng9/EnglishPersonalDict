@@ -12,8 +12,8 @@ function App() {
   const [wordData, setWordData] = useState({
     word: 'Apple',
     phonetic: '/ˈæpəl/',
-    EnglishDefinition: ['A common, round fruit produced by the tree Malus domestica, cultivated in temperate climates.',],
-    exampleSentences: ["I like apples.", "Apples are good for health."],
+    EnglishDefinition: ['','A common, round fruit produced by the tree Malus domestica, cultivated in temperate climates.',],
+    exampleSentences: ['',"I like apples.", "Apples are good for health."],
   });
   const [dailyWordCounts, setDailyWordCounts] = useState<{[key: string]: Set<string> }> (() => { //在这里添加索引签名，并且指明set的值类型
     const storedCounts = localStorage.getItem('dailyWordCounts');
@@ -134,34 +134,56 @@ function App() {
 
   };
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault(); // 关键：阻止表单的默认提交
+  };
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleAboutClick = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-primary py-6 flex flex-col items-center justify-start">
-      <header className="bg-blue-500 text-white p-4 rounded-md shadow-md mb-8 w-[80%] max-w-4xl">
+      <header className="bg-blue-500 text-white p-4 rounded-md shadow-md mb-8 w-[90%] mobile:w-[90%] md:w-[80%] max-w-4xl">
         <nav className="bg-blue-500 text-white p-4 w-full">
           <div className="container mx-auto flex items-center justify-between">
             {/* 左侧：网站名称或 Logo */}
             <div className="flex items-center">
               <Book className="h-6 w-6 mr-2" />
-              <span className="text-xl font-bold">English Word Learning</span>
+              <span className="text-xl font-bold">English Dictionary</span>
             </div>
 
             {/* 右侧：导航链接 */}
             <ul className="flex space-x-6"> 
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
-              <li><a href="#" className="hover:text-gray-300">About</a></li>
+              <li>
+                <button 
+                  onClick={handleAboutClick}
+                  className="hover:text-gray-300"
+                  type="button"
+                >
+                  About
+                </button>
+              </li>
             </ul>
           </div>
         </nav>
       </header>
-    
-      {/* 搜索框居中 */}
-      <div className="flex-grow flex items-center justify-center w-[80%] flex-1">
+
+      {/* 显式添加 form 并绑定 onSubmit */}
+      <form onSubmit={handleSubmit} className="flex-grow flex items-center justify-center w-[90%] mobile:w-[90%] md:w-[80%] flex-1">
         <div className="max-w-4/5 w-full py-12">
           <SearchBar onSearch={handleSearch} />
         </div>
-      </div>
+      </form>
 
-      <div className="w-[80%] max-w-4/5 flex flex-col mb-8 mt-4 overflow-auto">
+      <div className="w-[90%] mobile:w-[90%] md:w-[80%] max-w-4/5 flex flex-col mb-8 mt-4 overflow-auto">
         <WordDefinition
           word={wordData.word}
           phonetic={wordData.phonetic}
@@ -172,6 +194,23 @@ function App() {
           <Statistics wordSearchCounts={wordSearchCounts} dailyWordCounts={dailyWordCounts} />
         </div>
       </div>
+
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] mobile:w-[90%] md:w-[80%] max-w-md">
+            <h2 className="text-lg font-semibold text-blue-500 mb-4">About</h2>
+            <p>This is a fun English dictionary app for personal use.</p>
+            <p>More details email <a href="mailto:zzhmail01@gmail.com" className="text-blue-500 hover:underline">zzhmail01@gmail.com</a> </p>
+            <button
+              onClick={handleCloseDialog}
+              type="button"
+              className="px-4 py-2 mt-8 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 mx-auto block"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

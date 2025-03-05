@@ -108,15 +108,6 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
     { id: 'dailyQueryCount', label: 'Daily Search Count' },
   ];
 
-  // 将 wordList 分成三列
-  const wordsPerColumn = Math.ceil(wordList.length / 3);
-  const wordColumns = [];
-  for (let i = 0; i < 3; i++) {
-    wordColumns.push(
-      wordList.slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
-    );
-  }
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4">
       <h2 className="text-2xl font-bold mb-4">Statistics</h2>
@@ -144,7 +135,8 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
           <div>
             <h3 className="text-lg font-semibold text-blue-500">Daily Search Words</h3>
             <span className="text-gray-600">Total: {wordList.length}</span>
-            <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}>
+            {/* <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}> */}
+            <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {wordList.map((word, index) => (
                   <li key={index}> 
                     <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => openYouglish(word)}>
@@ -159,7 +151,8 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
         {activeTab === 'wordFrequency' && (
           <div>
             <h3 className="text-lg font-semibold text-blue-500">Word Search Frequency (Top 15)</h3>
-            <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}>
+            {/* <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}> */}
+            <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {sortedWordFrequency.map(([word, frequency], index) => (
                 <li key={index}>
                   {word}: {frequency}

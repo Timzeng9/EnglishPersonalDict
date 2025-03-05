@@ -32,13 +32,14 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
       <ul>
         {EnglishDefinitions.map((definition, index) => (
           <li key={index} className="text-gray-800 mt-2">
+            {index > 0 && (<span > {index} {'.'} </span>)}
             {definition.split(' ').map((word, wordIndex) => (
               <span
                 key={wordIndex}
                 className="cursor-pointer hover:underline hover:text-blue-500"
                 onClick={() => openYouglish(word)}
               >
-                {word} {' '} {/* Add space after each word */}
+                {word} {' '} 
               </span>
             ))}
           </li>
@@ -49,6 +50,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
       <ul>
         {exampleSentences.map((sentence, index) => (
           <li key={index} className="text-gray-800 mt-2">
+            {index > 0 && (<span > {index} {'.'} </span>)}
             {sentence.split(' ').map((word, wordIndex) => (
               <span
                 key={wordIndex}
