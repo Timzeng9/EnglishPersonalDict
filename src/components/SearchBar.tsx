@@ -27,7 +27,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         onChange={handleSearchChange}
         onKeyDown={(e) => {if (e.key === 'Enter') { handleSearchSubmit(e)}}}
       />
-      <button onClick={handleSearchSubmit} className="text-gray-500 hover:text-gray-700 focus:outline-none">
+      <button 
+        type="button"
+        onClick={handleSearchSubmit} 
+        className="text-gray-500 hover:text-gray-700 focus:outline-none">
         <Search className="h-5 w-5" />
       </button>
     </div>

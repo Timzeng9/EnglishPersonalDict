@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
 import WordDefinition from './components/WordDefinition';
 import Statistics from './components/Statistics';
@@ -153,13 +153,11 @@ function App() {
       <header className="bg-blue-500 text-white p-4 rounded-md shadow-md mb-8 w-[90%] mobile:w-[90%] md:w-[80%] max-w-4xl">
         <nav className="bg-blue-500 text-white p-4 w-full">
           <div className="container mx-auto flex items-center justify-between">
-            {/* 左侧：网站名称或 Logo */}
             <div className="flex items-center">
               <Book className="h-6 w-6 mr-2" />
               <span className="text-xl font-bold">English Dictionary</span>
             </div>
 
-            {/* 右侧：导航链接 */}
             <ul className="flex space-x-6"> 
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
               <li>
