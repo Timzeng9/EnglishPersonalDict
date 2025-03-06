@@ -8,12 +8,14 @@ interface WordDefinitionProps {
   phonetic: string;
   EnglishDefinitions: string[];
   exampleSentences: string[];
+  onSearch: (searchTerm: string) => void;
 }
 const WordDefinition: React.FC<WordDefinitionProps> = ({
   word,
   phonetic,
   EnglishDefinitions,
   exampleSentences,
+  onSearch,
 }) => {
 
   const { play, stop, isPlaying } = usePronunciationSound(word)
@@ -54,7 +56,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
               <span
                 key={wordIndex}
                 className="cursor-pointer hover:underline hover:text-blue-500"
-                onClick={() => openYouglish(word)}
+                onClick={() => onSearch(word)}
               >
                 {word} {' '} 
               </span>
@@ -72,7 +74,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
               <span
                 key={wordIndex}
                 className="cursor-pointer hover:underline hover:text-blue-500"
-                onClick={() => openYouglish(word)}
+                onClick={() => onSearch(word)}
               >
                 {word} {' '}
               </span>

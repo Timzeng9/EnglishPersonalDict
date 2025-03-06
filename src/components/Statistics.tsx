@@ -28,9 +28,10 @@ ChartJS.register(
 interface StatisticsProps {
   wordSearchCounts: any;
   dailyWordCounts: any;
+  onSearch: (searchTerm: string) => void;
 }
 
-const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCounts }) => {
+const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCounts, onSearch }) => {
   let wordList: string[] = [];
   let dailyQueryCount = Array.from({ length: 5 }, (_, i) => ({
     date: `mockDay ${i + 1}`,
@@ -139,7 +140,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
             <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {wordList.map((word, index) => (
                   <li key={index}> 
-                    <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => openYouglish(word)}>
+                    <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => onSearch(word)}>
                       {word}
                       </span> 
                   </li>
@@ -155,7 +156,9 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
             <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {sortedWordFrequency.map(([word, frequency], index) => (
                 <li key={index}>
-                  {word}: {frequency}
+                  <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => onSearch(word)}>
+                      {word}
+                    </span>: {frequency}
                 </li>
               ))}
             </ul>

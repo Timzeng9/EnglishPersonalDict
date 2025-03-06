@@ -187,9 +187,14 @@ function App() {
           phonetic={wordData.phonetic}
           EnglishDefinitions={wordData.EnglishDefinition.length>0?wordData.EnglishDefinition:[""]}
           exampleSentences={wordData.exampleSentences.length>0?wordData.exampleSentences:[""]}
+          onSearch={handleSearch}
         />
         <div id="statistics">
-          <Statistics wordSearchCounts={wordSearchCounts} dailyWordCounts={dailyWordCounts} />
+          <Statistics 
+              wordSearchCounts={wordSearchCounts} 
+              dailyWordCounts={dailyWordCounts}
+              onSearch={handleSearch}
+          />
         </div>
       </div>
 
