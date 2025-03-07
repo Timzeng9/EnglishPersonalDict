@@ -9,3 +9,26 @@ body {
 .highlight {
   background-color: yellow;
 }
+#toast-container {
+  position: fixed;
+  top: 120px;       /* 距离顶部 120px */
+  left: 50%;        /* 定位到水平中心 */
+  transform: translateX(-50%); /* 将元素向左移动自身宽度的一半 */
+  z-index: 1000;   /* 设置层叠顺序，确保在其他元素之上 */
+  pointer-events: none; /* 穿透点击事件，避免 Toast 阻挡下方元素点击 */
+  display: none;    /* 初始状态隐藏 */
+}
+
+#toast-message {
+  color: white;          /* 文本颜色白色 */
+  padding: 15px 25px;    /* 内边距，调整文字与边框距离 */
+  border-radius: 5px;     /* 圆角 */
+  font-size: 16px;      /* 字体大小 */
+  text-align: center;    /* 文本居中 */
+  opacity: 1;           /* 初始不透明度为 1 */
+  transition: opacity 1s ease-in-out; /* 过渡效果，opacity 属性，缓入缓出 */
+}
+
+#toast-message.fade-out {
+  opacity: 0; /* 渐变消失效果，不透明度变为 0 */
+}

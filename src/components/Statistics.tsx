@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { openYouglish } from './commonFunctions';
+import { removeNonEnglishLetters } from './commonFunctions';
 
 
 ChartJS.register(
@@ -109,6 +109,10 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
     { id: 'dailyQueryCount', label: 'Daily Search Count' },
   ];
 
+  const handleSubmit = (word : string) => {
+    onSearch(removeNonEnglishLetters(word))
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4">
       <h2 className="text-2xl font-bold mb-4">Statistics</h2>
@@ -140,7 +144,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
             <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {wordList.map((word, index) => (
                   <li key={index}> 
-                    <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => onSearch(word)}>
+                    <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
                       {word}
                       </span> 
                   </li>
@@ -156,7 +160,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
             <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {sortedWordFrequency.map(([word, frequency], index) => (
                 <li key={index}>
-                  <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => onSearch(word)}>
+                  <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
                       {word}
                     </span>: {frequency}
                 </li>

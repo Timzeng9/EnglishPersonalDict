@@ -3,6 +3,8 @@ import SearchBar from './components/SearchBar';
 import WordDefinition from './components/WordDefinition';
 import Statistics from './components/Statistics';
 import { Book } from 'lucide-react';
+import { isNotEnglishUnicode, openGoogleTranslate } from './components/commonFunctions';
+
 interface DailyWordCountsDictionary {
   [key: string]: Array<string>; 
 }
@@ -101,16 +103,7 @@ function App() {
     }
   };
 
-  function isNotEnglishUnicode(text: string) {
-    const allowedChars = /[^a-zA-Z\s.,!?';:"()\-\u2019]/;
-    return allowedChars.test(text);
-  }
-
-  const openGoogleTranslate = (word: string) => {
-    const url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${word}&op=translate`;
-    window.open(url, '_blank');
-  };
-
+  
   const handleSearch = async (term: string) => {
     if (isNotEnglishUnicode(term)) {
       openGoogleTranslate(term);
@@ -130,6 +123,7 @@ function App() {
       updateDailyWordCounts(today, term);
     }else{
       console.log("Word not found")
+      showToast("Sorry, the word was not found.");
     }
 
   };
@@ -146,6 +140,32 @@ function App() {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+  };
+
+  function showToast(message: string): void {
+    const toastContainer = document.getElementById('toast-container') as HTMLDivElement | null;
+    const toastMessageElement = document.getElementById('toast-message') as HTMLDivElement | null;
+
+    if (!toastContainer || !toastMessageElement) {
+        console.error("Toast container or message element not found!");
+        return;
+    }
+
+    toastMessageElement.classList.remove('fade-out');
+    toastMessageElement.style.opacity = '1';
+    toastMessageElement.classList.add('bg-blue-400');
+    toastMessageElement.textContent = message;
+
+    toastContainer.style.display = 'block';
+    // 触发 reflow
+    toastMessageElement.offsetHeight;
+    toastMessageElement.classList.add('fade-out');
+
+    setTimeout(() => {
+        toastMessageElement.classList.remove('fade-out');
+        toastMessageElement.classList.remove('bg-blue-400');
+        toastContainer.style.display = 'none';
+    }, 3000);
   };
 
   return (
@@ -173,6 +193,11 @@ function App() {
           </div>
         </nav>
       </header>
+
+      <div id="toast-container">
+        <div id="toast-message">
+            </div>
+      </div>
 
       {/* 显式添加 form 并绑定 onSubmit */}
       <form onSubmit={handleSubmit} className="flex-grow flex items-center justify-center w-[90%] mobile:w-[90%] md:w-[80%] flex-1">

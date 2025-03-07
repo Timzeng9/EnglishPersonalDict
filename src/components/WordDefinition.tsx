@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import usePronunciationSound from '../hooks/usePronunciation'
-import { openYouglish } from './commonFunctions';
+import { openYouglish, removeNonEnglishLetters } from './commonFunctions';
 
 interface WordDefinitionProps {
   word: string;
@@ -28,6 +28,10 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
   useEffect(() => {
     return stop
   }, [word, stop])
+
+  const handleSubmit = (word : string) => {
+    onSearch(removeNonEnglishLetters(word))
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4 relative">
@@ -56,7 +60,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
               <span
                 key={wordIndex}
                 className="cursor-pointer hover:underline hover:text-blue-500"
-                onClick={() => onSearch(word)}
+                onClick={() => handleSubmit(word)}
               >
                 {word} {' '} 
               </span>
@@ -65,7 +69,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         ))}
       </ul>
 
-      <h4 className="text-2xl font-bold mb-2 py-8">Example Sentences</h4>
+      {exampleSentences.length > 0 && <h4 className="text-2xl font-bold mb-2 py-8">Example Sentences</h4>}
       <ul>
         {exampleSentences.map((sentence, index) => (
           <li key={index} className="text-gray-800 mt-2">
@@ -74,7 +78,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
               <span
                 key={wordIndex}
                 className="cursor-pointer hover:underline hover:text-blue-500"
-                onClick={() => onSearch(word)}
+                onClick={() => handleSubmit(word)}
               >
                 {word} {' '}
               </span>
