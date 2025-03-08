@@ -167,7 +167,7 @@ export async function getDailyQueryCounts(userId: string, nDays: number): Promis
   const results: { [date: string]: number } = {};
 
   // 构建 N 天的日期数组
-  const dates = Array.from({ length: nDays }, (_, i) => format(subDays(today, i), 'yyyy-MM-dd'));
+  const dates = Array.from({ length: nDays }, (_, i) => format(subDays(today, i), 'yyyy-MM-dd')).reverse();
 
   // 使用 Promise.all 并发查询
   await Promise.all(

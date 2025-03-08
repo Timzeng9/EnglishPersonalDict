@@ -16,6 +16,7 @@ import {
   addQueriedWord,
   getDailyQueries,
   getTopNQueriesEfficient,
+  getDailyQueryCounts,
 } from './components/commonFunctions';
 
 function App() {
@@ -70,11 +71,16 @@ function App() {
           const dailyQueries = await getDailyQueries(currentUser.uid, today);
           if (dailyQueries) {
             setTodayWords(() => new Set(Object.keys(dailyQueries.words)));
-            const count = Object.keys(dailyQueries.words).length;
-            const daycount = (dailyWordCounts[today] || 0);
-            if(count > daycount)
-              addDailyWordCounts(today, count - daycount);
+            // const count = Object.keys(dailyQueries.words).length;
+            // const daycount = (dailyWordCounts[today] || 0);
+            // if(count > daycount)
+            //   addDailyWordCounts(today, count - daycount);
           }
+
+          getDailyQueryCounts(currentUser.uid, 50).then((result) => {
+            if(!result) return;
+            setDailyWordCounts(() => result);
+          });
 
           getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
             if(!result) return;
