@@ -26,27 +26,25 @@ ChartJS.register(
 );
 
 interface StatisticsProps {
+  todayWords: any;
   wordSearchCounts: any;
   dailyWordCounts: any;
   onSearch: (searchTerm: string) => void;
 }
 
-const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCounts, onSearch }) => {
-  let wordList: string[] = [];
+const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, dailyWordCounts, onSearch }) => {
+  console.log("Statistics", todayWords, wordSearchCounts, dailyWordCounts);
+  let wordList:string[] = Array.from(todayWords);
   let dailyQueryCount = Array.from({ length: 5 }, (_, i) => ({
     date: `mockDay ${i + 1}`,
     count: Math.floor(Math.random() * 20) + 5, // Random count between 5 and 25
   }));
 
   if(dailyWordCounts){
-    const today = new Date().toISOString().split('T')[0];
-    const dayCounts = dailyWordCounts[today] || new Set(); 
-    wordList = Array.from(dayCounts);
-
     for (const day in dailyWordCounts) {
       dailyQueryCount.push({
         date: day,
-        count: dailyWordCounts[day].size,
+        count: dailyWordCounts[day],
       });
     }
   }
@@ -57,10 +55,8 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
     for (const word in wordSearchCounts) {
       wordFrequency[word] = wordSearchCounts[word];
     }
-   
   }
 
-  console.log("wordFrequency", wordFrequency)
   const sortedWordFrequency = Object.entries(wordFrequency)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 15);

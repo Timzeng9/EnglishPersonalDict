@@ -3,107 +3,102 @@ import SearchBar from './components/SearchBar';
 import WordDefinition from './components/WordDefinition';
 import Statistics from './components/Statistics';
 import { Book } from 'lucide-react';
-import { isNotEnglishUnicode, openGoogleTranslate } from './components/commonFunctions';
-
-interface DailyWordCountsDictionary {
-  [key: string]: Array<string>; 
-}
+import { useAuth } from './contexts/AuthContext';
+import { signOut } from 'firebase/auth';
+import { auth } from './firebase';
+import Modal from './components/Modal';
+import AuthForm from './components/AuthForm';
+import { format } from 'date-fns';
+import {
+  isNotEnglishUnicode,
+  fetchWordData,
+  openGoogleTranslate,
+  addQueriedWord,
+  getDailyQueries,
+  getTopNQueriesEfficient,
+} from './components/commonFunctions';
 
 function App() {
-  // localStorage.clear();
+
+  const { currentUser } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false); // 控制 Modal 显示的状态
+
+  // 当前查询的单词
   const [wordData, setWordData] = useState({
     word: 'Apple',
     phonetic: '/ˈæpəl/',
-    EnglishDefinition: ['','A common, round fruit produced by the tree Malus domestica, cultivated in temperate climates.',],
-    exampleSentences: ['',"I like apples.", "Apples are good for health."],
+    EnglishDefinition: ['', 'A common, round fruit produced by the tree Malus domestica, cultivated in temperate climates.',],
+    exampleSentences: ['', "I like apples.", "Apples are good for health."],
   });
-  const [dailyWordCounts, setDailyWordCounts] = useState<{[key: string]: Set<string> }> (() => { //在这里添加索引签名，并且指明set的值类型
-    const storedCounts = localStorage.getItem('dailyWordCounts');
-    if (storedCounts) {
-      const parsedCounts = JSON.parse(storedCounts);
-      for (const day in parsedCounts) {
-        parsedCounts[day] = new Set(parsedCounts[day]);
-      }
-      return parsedCounts;
-    }
-    return {};
-  });
-  const [wordSearchCounts, setWordSearchCounts] = useState(() => {
-    const storedSearchCounts = localStorage.getItem('wordSearchCounts');
-    return storedSearchCounts ? JSON.parse(storedSearchCounts) : {};
-  });
-
-  useEffect(() => {
-    const countsToStore: DailyWordCountsDictionary = {};
-    for (const day in dailyWordCounts) {
-      countsToStore[day] = Array.from(dailyWordCounts[day]);
-    }
-    localStorage.setItem('dailyWordCounts', JSON.stringify(countsToStore));
-  }, [dailyWordCounts]);
-
-  useEffect(() => {
-    localStorage.setItem('wordSearchCounts', JSON.stringify(wordSearchCounts));
-  }, [wordSearchCounts]);
-
-  const updateDailyWordCounts = (date: string, word: string) => {
-    setDailyWordCounts((prevCounts: { [x: string]: Set<string>; }) => {
-      const dayCounts = prevCounts[date] || new Set(); // 初始化Set
-      dayCounts.add(word); // 使用 Set 的 add 方法确保唯一性
-
+  // 每日查词数量
+  const [dailyWordCounts, setDailyWordCounts] = useState<{ [key: string]: number }>({});
+  const addDailyWordCounts = (date: string, count: number) => {
+    setDailyWordCounts((prevCounts: { [x: string]: number; }) => {
+      const dayCounts = (prevCounts[date] || 0) + count; // 初始化Set
       return {
         ...prevCounts,
         [date]: dayCounts,
       };
     });
   };
-
-  const updateWordSearchCounts = (word: string, count: number) => {
-    setWordSearchCounts((prevCounts: any) => ({
-      ...prevCounts,
-      [word]: count,
-    }));
+  // 今日查询单词
+  const [todayWords, setTodayWords] = useState<Set<string>>(new Set());
+  const addWord = (newWord: string) => {
+    setTodayWords(prevWords => new Set([...prevWords, newWord]));
   };
 
+  const [wordFrequency, setWordFrequency] = useState<{ [word: string]: number  }>({});
+  const addwordFrequency = (newWord: string) => {
+    setWordFrequency((prevCounts: { [x: string]: number; }) => {
+      const dayCounts = (prevCounts[newWord] || 0) + 1; // 初始化Set
+      return {
+        ...prevCounts,
+        [newWord]: dayCounts,
+      };
+    });
+  };
 
-  const fetchWordData = async (term: string) => {
-    try {
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${term}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      if (data && data.length > 0) {
-        const wordData = {
-          word: data[0].word,
-          phonetic: data[0].phonetics[0]?.text || '',
-          EnglishDefinition: [""],
-          exampleSentences: [""],
+  let login_init = false;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (currentUser) { // 检查 currentUser 是否存在 (已登录)
+        try {
+          if(login_init) return;
+          login_init = true;
+          console.log("login currentUser", currentUser);
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const dailyQueries = await getDailyQueries(currentUser.uid, today);
+          if (dailyQueries) {
+            setTodayWords(() => new Set(Object.keys(dailyQueries.words)));
+            const count = Object.keys(dailyQueries.words).length;
+            const daycount = (dailyWordCounts[today] || 0);
+            if(count > daycount)
+              addDailyWordCounts(today, count - daycount);
+          }
+
+          getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
+            if(!result) return;
+            setWordFrequency(() => result);
+          });
+
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-        if(data[0].meanings){
-            for(const meaning of data[0].meanings){
-              if(meaning.definitions){
-                for(const definition of meaning.definitions){
-                  wordData.EnglishDefinition.push(definition.definition)
-                  if(definition.example && wordData.exampleSentences.length < 8){
-                    wordData.exampleSentences.push(definition.example)
-                  }
-                }
-              }
-            }
-        }
-        
-        return wordData
+      } else {
+        console.log("login currentUser", currentUser);
       }
-      else {
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching word data:', error);
-      return null;
+    };
+
+    fetchData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    // 今日单词有变化，需要更新最高频率单词
+    if (currentUser) {
+      
     }
-  };
+  }, [todayWords]);
 
-  
   const handleSearch = async (term: string) => {
     if (isNotEnglishUnicode(term)) {
       openGoogleTranslate(term);
@@ -111,16 +106,26 @@ function App() {
     }
 
     const wordData = await fetchWordData(term);
-    if(wordData){
-    setWordData(wordData);
-      console.log("wordSearchCounts", wordSearchCounts)
-      console.log("dailyWordCounts", dailyWordCounts)
-      // 假设查询成功，更新查词列表
-      updateWordSearchCounts(term, (wordSearchCounts[term] || 0) + 1);
-      // 获取当前日期，并更新每日查词量
-      const today = new Date().toISOString().split('T')[0];
-      updateDailyWordCounts(today, term);
-    }else{
+    if (wordData) {
+      setWordData(wordData);
+      addwordFrequency(term);
+      if(!todayWords.has(term))
+      {
+        addDailyWordCounts(format(new Date(), 'yyyy-MM-dd'), 1);
+        addWord(term);
+      }
+
+      console.log("Word found", todayWords, wordFrequency, dailyWordCounts);
+      // 增加查询的单词到数据库
+      if (currentUser && currentUser.uid){
+        addQueriedWord(currentUser.uid as string, term);
+        getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
+          if(!result) return;
+          setWordFrequency(() => result);
+        });
+      }
+
+    } else {
       console.log("Word not found")
       showToast("Sorry, the word was not found.");
     }
@@ -134,7 +139,8 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAboutClick = () => {
-    setIsDialogOpen(true);
+    // setIsDialogOpen(true);
+    console.log('currentUser', currentUser, currentUser?.email)
   };
 
   const handleCloseDialog = () => {
@@ -146,8 +152,8 @@ function App() {
     const toastMessageElement = document.getElementById('toast-message') as HTMLDivElement | null;
 
     if (!toastContainer || !toastMessageElement) {
-        console.error("Toast container or message element not found!");
-        return;
+      console.error("Toast container or message element not found!");
+      return;
     }
 
     toastMessageElement.classList.remove('fade-out');
@@ -161,10 +167,19 @@ function App() {
     toastMessageElement.classList.add('fade-out');
 
     setTimeout(() => {
-        toastMessageElement.classList.remove('fade-out');
-        toastMessageElement.classList.remove('bg-blue-400');
-        toastContainer.style.display = 'none';
+      toastMessageElement.classList.remove('fade-out');
+      toastMessageElement.classList.remove('bg-blue-400');
+      toastContainer.style.display = 'none';
     }, 3000);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      showToast("Signed out successfully.");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (
@@ -177,10 +192,11 @@ function App() {
               <span className="text-xl font-bold">English Dictionary</span>
             </div>
 
-            <ul className="flex space-x-6"> 
+            <ul className="flex space-x-6">
+              <li>{currentUser?.email?.split('@')[0]} </li>
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
               <li>
-                <button 
+                <button
                   onClick={handleAboutClick}
                   className="hover:text-gray-300"
                   type="button"
@@ -188,14 +204,29 @@ function App() {
                   About
                 </button>
               </li>
+              <li>
+                {currentUser ? (
+                  <button onClick={handleSignOut} className="hover:text-gray-300">
+                    Logout
+                  </button>
+                ) : (
+                  <button onClick={() => setIsModalOpen(true)} className="hover:text-gray-300">
+                    Login / Sign Up
+                  </button>
+                )}
+              </li>
             </ul>
           </div>
         </nav>
       </header>
 
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <AuthForm onClose={() => setIsModalOpen(false)} />
+      </Modal>
+
       <div id="toast-container">
         <div id="toast-message">
-            </div>
+        </div>
       </div>
 
       {/* 显式添加 form 并绑定 onSubmit */}
@@ -209,15 +240,16 @@ function App() {
         <WordDefinition
           word={wordData.word}
           phonetic={wordData.phonetic}
-          EnglishDefinitions={wordData.EnglishDefinition.length>0?wordData.EnglishDefinition:[""]}
-          exampleSentences={wordData.exampleSentences.length>0?wordData.exampleSentences:[""]}
+          EnglishDefinitions={wordData.EnglishDefinition.length > 0 ? wordData.EnglishDefinition : [""]}
+          exampleSentences={wordData.exampleSentences.length > 0 ? wordData.exampleSentences : [""]}
           onSearch={handleSearch}
         />
         <div id="statistics">
-          <Statistics 
-              wordSearchCounts={wordSearchCounts} 
-              dailyWordCounts={dailyWordCounts}
-              onSearch={handleSearch}
+          <Statistics
+            todayWords={todayWords}
+            wordSearchCounts={wordFrequency}
+            dailyWordCounts={dailyWordCounts}
+            onSearch={handleSearch}
           />
         </div>
       </div>
