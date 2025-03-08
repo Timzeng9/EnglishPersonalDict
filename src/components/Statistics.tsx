@@ -33,14 +33,13 @@ interface StatisticsProps {
 }
 
 const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, dailyWordCounts, onSearch }) => {
-  console.log("Statistics", todayWords, wordSearchCounts, dailyWordCounts);
-  let wordList:string[] = Array.from(todayWords);
+  let wordList: string[] = Array.from(todayWords);
   let dailyQueryCount = Array.from({ length: 5 }, (_, i) => ({
     date: `mockDay ${i + 1}`,
     count: Math.floor(Math.random() * 20) + 5, // Random count between 5 and 25
   }));
 
-  if(dailyWordCounts){
+  if (dailyWordCounts) {
     for (const day in dailyWordCounts) {
       dailyQueryCount.push({
         date: day,
@@ -50,8 +49,7 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
   }
 
   let wordFrequency: { [word: string]: number } = {};
-  if(wordSearchCounts)
-  {
+  if (wordSearchCounts) {
     for (const word in wordSearchCounts) {
       wordFrequency[word] = wordSearchCounts[word];
     }
@@ -97,7 +95,7 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
     ],
   };
 
-  const [activeTab, setActiveTab] = useState('dailyWords'); 
+  const [activeTab, setActiveTab] = useState('dailyWords');
 
   const tabs = [
     { id: 'dailyWords', label: 'Daily Search Words' },
@@ -105,7 +103,7 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
     { id: 'dailyQueryCount', label: 'Daily Search Count' },
   ];
 
-  const handleSubmit = (word : string) => {
+  const handleSubmit = (word: string) => {
     onSearch(removeNonEnglishLetters(word))
   };
 
@@ -118,11 +116,10 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`mr-4 px-4 py-2 rounded-lg ${
-              activeTab === tab.id
+            className={`mr-4 px-4 py-2 rounded-lg ${activeTab === tab.id
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-            }`}
+              }`}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
@@ -132,18 +129,18 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
 
       {/* 选项卡内容 */}
       <div>
-      {activeTab === 'dailyWords' && (
+        {activeTab === 'dailyWords' && (
           <div>
             <h3 className="text-lg font-semibold text-blue-500">Daily Search Words</h3>
             <span className="text-gray-600">Total: {wordList.length}</span>
             {/* <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}> */}
             <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
               {wordList.map((word, index) => (
-                  <li key={index}> 
-                    <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
-                      {word}
-                      </span> 
-                  </li>
+                <li key={index}>
+                  <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
+                    {word}
+                  </span>
+                </li>
               ))}
             </ul>
           </div>
@@ -157,8 +154,8 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
               {sortedWordFrequency.map(([word, frequency], index) => (
                 <li key={index}>
                   <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
-                      {word}
-                    </span>: {frequency}
+                    {word}
+                  </span>: {frequency}
                 </li>
               ))}
             </ul>
@@ -171,25 +168,25 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
         {activeTab === 'dailyQueryCount' && (
           <div>
             <div className="container mx-auto flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-blue-500">
-              Daily Search Count
-            </h3>
-            
-            <div className="flex space-x-6">
-              <label htmlFor="xLabelsCount" className="mr-2">
-                Show Days:
-              </label>
-              <select
-                id="xLabelsCount"
-                value={xLabelsCount}
-                onChange={handleXLabelsCountChange}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={30}>30</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
+              <h3 className="text-lg font-semibold text-blue-500">
+                Daily Search Count
+              </h3>
+
+              <div className="flex space-x-6">
+                <label htmlFor="xLabelsCount" className="mr-2">
+                  Show Days:
+                </label>
+                <select
+                  id="xLabelsCount"
+                  value={xLabelsCount}
+                  onChange={handleXLabelsCountChange}
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
             </div>
 
             <div className="mt-4" style={{ overflowX: 'auto' }}> {/* 允许图表水平滚动 */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
 import WordDefinition from './components/WordDefinition';
 import Statistics from './components/Statistics';
+import History from './components/History';
 import { Book } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { signOut } from 'firebase/auth';
@@ -71,10 +72,6 @@ function App() {
           const dailyQueries = await getDailyQueries(currentUser.uid, today);
           if (dailyQueries) {
             setTodayWords(() => new Set(Object.keys(dailyQueries.words)));
-            // const count = Object.keys(dailyQueries.words).length;
-            // const daycount = (dailyWordCounts[today] || 0);
-            // if(count > daycount)
-            //   addDailyWordCounts(today, count - daycount);
           }
 
           getDailyQueryCounts(currentUser.uid, 50).then((result) => {
@@ -197,9 +194,10 @@ function App() {
               <span className="text-lg mobile:text-lg md:text-xl font-bold">English Dictionary</span>
             </div>
 
-            <ul className="flex space-x-6 mt-4 md:mt-0"> 
+            <ul className="flex space-x-3 mt-4 md:mt-0"> 
               <li>{currentUser?.email?.split('@')[0]} </li>
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
+              <li><a href="#history" className="hover:text-gray-300">History</a></li>
               <li>
                 <button
                   onClick={handleAboutClick}
@@ -256,6 +254,11 @@ function App() {
             dailyWordCounts={dailyWordCounts}
             onSearch={handleSearch}
           />
+        </div>
+        <div id="history">
+          <History
+            onSearch={handleSearch}
+            />
         </div>
       </div>
 
