@@ -118,7 +118,6 @@ function App() {
       // 假设查询成功，更新查词列表
       updateWordSearchCounts(term, (wordSearchCounts[term] || 0) + 1);
       // 获取当前日期，并更新每日查词量
-      // 获取当前日期，并更新每日查词量
       const today = new Date().toISOString().split('T')[0];
       updateDailyWordCounts(today, term);
     }else{
@@ -129,7 +128,7 @@ function App() {
   };
 
   const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault(); // 关键：阻止表单的默认提交
+    event.preventDefault(); // 阻止表单的默认提交
   };
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);

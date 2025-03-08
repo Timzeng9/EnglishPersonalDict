@@ -53,8 +53,6 @@ export function generateWordSoundSrc(word: string, pronunciation: Exclude<Pronun
 export default function usePronunciationSound(word: string, isLoop?: boolean) {
   const pronunciationConfig = pronunciationConfigAtom
   const loop = useMemo(() => (typeof isLoop === 'boolean' ? isLoop : pronunciationConfig.isLoop), [isLoop, pronunciationConfig.isLoop])
-  const [isPlaying, setIsPlaying] = useState(false)
-
   const [play, { stop, sound }] = useSound(generateWordSoundSrc(word, pronunciationConfig.type), {
     html5: true,
     format: ['mp3'],
@@ -71,21 +69,12 @@ export default function usePronunciationSound(word: string, isLoop?: boolean) {
 
   useEffect(() => {
     if (!sound) return
-    const unListens: Array<() => void> = []
-
-    unListens.push(addHowlListener(sound, 'play', () => setIsPlaying(true)))
-    unListens.push(addHowlListener(sound, 'end', () => setIsPlaying(false)))
-    unListens.push(addHowlListener(sound, 'pause', () => setIsPlaying(false)))
-    unListens.push(addHowlListener(sound, 'playerror', () => setIsPlaying(false)))
-
     return () => {
-      setIsPlaying(false)
-      unListens.forEach((unListen) => unListen())
       ;(sound as Howl).unload()
     }
   }, [sound])
 
-  return { play, stop, isPlaying }
+  return { play, stop }
 }
 
 export function usePrefetchPronunciationSound(word: string | undefined) {

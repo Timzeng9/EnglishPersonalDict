@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import { Play, Youtube, Image } from 'lucide-react';
 import usePronunciationSound from '../hooks/usePronunciation'
-import { openYouglish, removeNonEnglishLetters } from './commonFunctions';
+import { openYouglish, removeNonEnglishLetters, openPixabaySearch } from './commonFunctions';
 
 interface WordDefinitionProps {
   word: string;
@@ -18,7 +18,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
   onSearch,
 }) => {
 
-  const { play, stop, isPlaying } = usePronunciationSound(word)
+  const { play, stop } = usePronunciationSound(word)
 
   const playSound = useCallback(() => {
     stop()
@@ -38,10 +38,23 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
       <h2 className="text-6xl font-bold mb-2">
       <span
         className="cursor-pointer text-blue-500"
-        onClick={() => openYouglish(word)}
         >
           {word} {' '} 
         </span>
+        <button
+          className="text-green-500 hover:text-green-700 focus:outline-none"
+          onClick={() => openPixabaySearch(word)}
+        >
+          <Image className="inline-block h-10 w-10" />
+        </button>
+        {' '} 
+        <button
+          className="text-red-500 hover:text-red-700 focus:outline-none"
+          onClick={() => openYouglish(word)}
+        >
+          <Youtube className="inline-block h-12 w-12" />
+        </button>
+        {' '} 
         <button
           className="text-blue-500 hover:text-blue-700 focus:outline-none"
           onClick={playSound}
