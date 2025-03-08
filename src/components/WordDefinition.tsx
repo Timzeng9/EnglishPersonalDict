@@ -69,7 +69,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         ))}
       </ul>
 
-      {exampleSentences.length > 0 && <h4 className="text-2xl font-bold mb-2 py-8">Example Sentences</h4>}
+      {exampleSentences.length > 1 && <h4 className="text-2xl font-bold mb-2 py-8">Example Sentences</h4>}
       <ul>
         {exampleSentences.map((sentence, index) => (
           <li key={index} className="text-gray-800 mt-2">
