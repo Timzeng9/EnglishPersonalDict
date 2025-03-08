@@ -48,7 +48,7 @@ function App() {
     setTodayWords(prevWords => new Set([...prevWords, newWord]));
   };
 
-  const [wordFrequency, setWordFrequency] = useState<{ [word: string]: number  }>({});
+  const [wordFrequency, setWordFrequency] = useState<{ [word: string]: number }>({});
   const addwordFrequency = (newWord: string) => {
     setWordFrequency((prevCounts: { [x: string]: number; }) => {
       const dayCounts = (prevCounts[newWord] || 0) + 1; // 初始化Set
@@ -64,7 +64,7 @@ function App() {
     const fetchData = async () => {
       if (currentUser) { // 检查 currentUser 是否存在 (已登录)
         try {
-          if(login_init) return;
+          if (login_init) return;
           login_init = true;
           console.log("login currentUser", currentUser);
           const today = format(new Date(), 'yyyy-MM-dd');
@@ -78,12 +78,12 @@ function App() {
           }
 
           getDailyQueryCounts(currentUser.uid, 50).then((result) => {
-            if(!result) return;
+            if (!result) return;
             setDailyWordCounts(() => result);
           });
 
           getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
-            if(!result) return;
+            if (!result) return;
             setWordFrequency(() => result);
           });
 
@@ -101,7 +101,7 @@ function App() {
   useEffect(() => {
     // 今日单词有变化，需要更新最高频率单词
     if (currentUser) {
-      
+
     }
   }, [todayWords]);
 
@@ -115,18 +115,17 @@ function App() {
     if (wordData) {
       setWordData(wordData);
       addwordFrequency(term);
-      if(!todayWords.has(term))
-      {
+      if (!todayWords.has(term)) {
         addDailyWordCounts(format(new Date(), 'yyyy-MM-dd'), 1);
         addWord(term);
       }
 
       console.log("Word found", todayWords, wordFrequency, dailyWordCounts);
       // 增加查询的单词到数据库
-      if (currentUser && currentUser.uid){
+      if (currentUser && currentUser.uid) {
         addQueriedWord(currentUser.uid as string, term);
         getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
-          if(!result) return;
+          if (!result) return;
           setWordFrequency(() => result);
         });
       }
@@ -192,13 +191,13 @@ function App() {
     <div className="min-h-screen bg-primary py-6 flex flex-col items-center justify-start">
       <header className="bg-blue-500 text-white p-4 rounded-md shadow-md mb-8 w-[90%] mobile:w-[90%] md:w-[80%] max-w-4xl">
         <nav className="bg-blue-500 text-white p-4 w-full">
-          <div className="container mx-auto flex items-center justify-between">
+          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between"> 
             <div className="flex items-center">
               <Book className="h-6 w-6 mr-2" />
-              <span className="text-xl font-bold">English Dictionary</span>
+              <span className="text-lg mobile:text-lg md:text-xl font-bold">English Dictionary</span>
             </div>
 
-            <ul className="flex space-x-6">
+            <ul className="flex space-x-6 mt-4 md:mt-0"> 
               <li>{currentUser?.email?.split('@')[0]} </li>
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
               <li>
