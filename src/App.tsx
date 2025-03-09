@@ -3,6 +3,7 @@ import SearchBar from './components/SearchBar';
 import WordDefinition from './components/WordDefinition';
 import Statistics from './components/Statistics';
 import History from './components/History';
+import ScrollToTopButton from './components/ScrollToTopButton';
 import { Book } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { signOut } from 'firebase/auth';
@@ -67,7 +68,6 @@ function App() {
         try {
           if (login_init) return;
           login_init = true;
-          console.log("login currentUser", currentUser);
           const today = format(new Date(), 'yyyy-MM-dd');
           const dailyQueries = await getDailyQueries(currentUser.uid, today);
           if (dailyQueries) {
@@ -217,7 +217,7 @@ function App() {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <AuthForm onClose={() => setIsModalOpen(false)} />
       </Modal>
-
+      <ScrollToTopButton />
       <div id="toast-container">
         <div id="toast-message">
         </div>
