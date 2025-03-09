@@ -9,23 +9,31 @@ import {
 import { removeNonEnglishLetters } from './commonFunctions';
 
 interface HistoryProps {
+  todayWords: any;
   onSearch: (searchTerm: string) => void;
 }
 
-const History: React.FC<HistoryProps> = ({onSearch}) => {
+const History: React.FC<HistoryProps> = ({todayWords, onSearch}) => {
   const { currentUser } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [todayWords, setTodayWords] = useState<string[]>([]);
+  const [dayWords, setDayWords] = useState<string[]>([]);
 
   useEffect(() => {
     if (selectedDate && currentUser) {
-      console.log('selectedDate', selectedDate, currentUser);
       const fetchData = async () => {
         try {
           const select_day = format(selectedDate, 'yyyy-MM-dd');
+          const today = format(new Date(), 'yyyy-MM-dd');
+          if(select_day === today){
+            setDayWords(() => Array.from(todayWords));
+            return;
+          }
           const dailyQueries = await getDailyQueries(currentUser.uid, select_day);
           if (dailyQueries) {
-            setTodayWords(() => Object.keys(dailyQueries.words));
+            setDayWords(() => Object.keys(dailyQueries.words));
+          }
+          else {
+            setDayWords(()=> []);
           }
 
         } catch (error) {
@@ -35,7 +43,7 @@ const History: React.FC<HistoryProps> = ({onSearch}) => {
 
       fetchData();
     }
-  }, [selectedDate, currentUser]);
+  }, [selectedDate, todayWords, currentUser]);
 
   const handleSubmit = (word: string) => {
     onSearch(removeNonEnglishLetters(word))
@@ -65,10 +73,10 @@ const History: React.FC<HistoryProps> = ({onSearch}) => {
 
       <div>
         <h3 className="text-lg font-semibold text-blue-500">Daily Search Words</h3>
-        <span className="text-gray-600">Total: {todayWords.length}</span>
+        <span className="text-gray-600">Total: {dayWords.length}</span>
         {/* <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}> */}
         <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
-          {todayWords.map((word, index) => (
+          {dayWords.map((word, index) => (
             <li key={index}>
               <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
                 {word}

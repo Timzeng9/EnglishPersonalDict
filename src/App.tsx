@@ -95,13 +95,6 @@ function App() {
     fetchData();
   }, [currentUser]);
 
-  useEffect(() => {
-    // 今日单词有变化，需要更新最高频率单词
-    if (currentUser) {
-
-    }
-  }, [todayWords]);
-
   const handleSearch = async (term: string) => {
     if (isNotEnglishUnicode(term)) {
       openGoogleTranslate(term);
@@ -117,14 +110,13 @@ function App() {
         addWord(term);
       }
 
-      console.log("Word found", todayWords, wordFrequency, dailyWordCounts);
       // 增加查询的单词到数据库
       if (currentUser && currentUser.uid) {
-        addQueriedWord(currentUser.uid as string, term);
-        getTopNQueriesEfficient(currentUser.uid, 15).then((result) => {
-          if (!result) return;
+        await addQueriedWord(currentUser.uid as string, term);
+        const result = await getTopNQueriesEfficient(currentUser.uid, 15);
+        if (result){
           setWordFrequency(() => result);
-        });
+        }
       }
 
     } else {
@@ -257,6 +249,7 @@ function App() {
         </div>
         <div id="history">
           <History
+            todayWords={todayWords}
             onSearch={handleSearch}
             />
         </div>
