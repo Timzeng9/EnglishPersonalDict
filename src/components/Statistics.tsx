@@ -109,7 +109,7 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4">
-      <h2 className="text-2xl font-bold mb-4">Statistics</h2>
+      <h2 className="text-4xl font-bold mb-4 text-blue-500">Statistics</h2>
 
       {/* 选项卡 */}
       <div className="flex mb-4 justify-center items-center">

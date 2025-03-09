@@ -114,7 +114,7 @@ function App() {
       if (currentUser && currentUser.uid) {
         await addQueriedWord(currentUser.uid as string, term);
         const result = await getTopNQueriesEfficient(currentUser.uid, 15);
-        if (result){
+        if (result) {
           setWordFrequency(() => result);
         }
       }
@@ -176,16 +176,16 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-primary py-6 flex flex-col items-center justify-start">
+    <div className="min-h-screen bg-gray-400 py-6 flex flex-col items-center justify-start">
       <header className="bg-blue-500 text-white p-4 rounded-md shadow-md mb-8 w-[90%] mobile:w-[90%] md:w-[80%] max-w-4xl">
         <nav className="bg-blue-500 text-white p-4 w-full">
-          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between"> 
+          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center">
               <Book className="h-6 w-6 mr-2" />
               <span className="text-lg mobile:text-lg md:text-xl font-bold">English Dictionary</span>
             </div>
 
-            <ul className="flex space-x-3 mt-4 md:mt-0"> 
+            <ul className="flex space-x-3 mt-4 md:mt-0">
               <li>{currentUser?.email?.split('@')[0]} </li>
               <li><a href="#statistics" className="hover:text-gray-300">Statistics</a></li>
               <li><a href="#history" className="hover:text-gray-300">History</a></li>
@@ -238,6 +238,7 @@ function App() {
           exampleSentences={wordData.exampleSentences.length > 0 ? wordData.exampleSentences : [""]}
           onSearch={handleSearch}
         />
+
         <div id="statistics">
           <Statistics
             todayWords={todayWords}
@@ -250,7 +251,7 @@ function App() {
           <History
             todayWords={todayWords}
             onSearch={handleSearch}
-            />
+          />
         </div>
       </div>
 

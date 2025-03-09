@@ -35,7 +35,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4 relative">
-      <h2 className="text-6xl font-bold mb-2">
+      <h2 className="text-5xl font-bold mb-2">
       <span
         className="cursor-pointer text-blue-500"
         >
