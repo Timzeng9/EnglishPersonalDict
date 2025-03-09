@@ -133,8 +133,7 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAboutClick = () => {
-    // setIsDialogOpen(true);
-    console.log('currentUser', currentUser, currentUser?.email)
+    setIsDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
