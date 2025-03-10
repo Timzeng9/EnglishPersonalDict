@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,7 +11,11 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { removeNonEnglishLetters } from './commonFunctions';
+import {
+  removeNonEnglishLetters,
+  getPaginatedTopQueriesEfficient,
+} from './commonFunctions';
+import { useAuth } from '../contexts/AuthContext';
 
 
 ChartJS.register(
@@ -26,14 +30,13 @@ ChartJS.register(
 );
 
 interface StatisticsProps {
-  todayWords: any;
   wordSearchCounts: any;
   dailyWordCounts: any;
   onSearch: (searchTerm: string) => void;
 }
 
-const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, dailyWordCounts, onSearch }) => {
-  let wordList: string[] = Array.from(todayWords);
+const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCounts, onSearch }) => {
+  const { currentUser } = useAuth();
   let dailyQueryCount = Array.from({ length: 5 }, (_, i) => ({
     date: `mockDay ${i + 1}`,
     count: Math.floor(Math.random() * 20) + 5, // Random count between 5 and 25
@@ -95,17 +98,76 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
     ],
   };
 
-  const [activeTab, setActiveTab] = useState('dailyWords');
+  const [activeTab, setActiveTab] = useState('dailyQueryCount');
 
   const tabs = [
-    { id: 'dailyWords', label: 'Daily Search Words' },
-    { id: 'wordFrequency', label: 'Word Search Frequency' },
-    { id: 'dailyQueryCount', label: 'Daily Search Count' },
+    { id: 'dailyQueryCount', label: 'Daily Count' },
+    { id: 'wordFrequency', label: 'Word Frequency' },
   ];
 
   const handleSubmit = (word: string) => {
     onSearch(removeNonEnglishLetters(word))
   };
+
+  // let historyCursors: any[] = [];
+  // let currentData: { [word: string]: number; } | null = null;
+
+  // async function nextPage() {
+  //   const { data, nextCursor } = await getPaginatedTopQueriesEfficient(
+  //     userId,
+  //     pageSize,
+  //     cursor
+  //   );
+  //   if (currentData) {
+  //     historyCursors.unshift(cursor);
+  //   }
+  //   currentData = data;
+  //   cursor = nextCursor;
+  //   displayData(data);
+  // }
+
+  // async function previousPage() {
+  //   if (historyCursors.length > 0) {
+  //     cursor = historyCursors.shift();
+  //     const { data, nextCursor } = await getPaginatedTopQueriesEfficient(
+  //       userId,
+  //       pageSize,
+  //       cursor
+  //     );
+  //     currentData = data;
+  //     cursor = nextCursor;
+  //     displayData(data);
+  //   } else {
+  //     console.log("已经是第一页");
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     const fetchData = async () => {
+  //       try {
+  //         const select_day = format(selectedDate, 'yyyy-MM-dd');
+  //         const today = format(new Date(), 'yyyy-MM-dd');
+  //         if (select_day === today) {
+  //           setDayWords(() => Array.from(todayWords));
+  //           return;
+  //         }
+  //         const dailyQueries = await getDailyQueries(currentUser.uid, select_day);
+  //         if (dailyQueries) {
+  //           setDayWords(() => Object.keys(dailyQueries.words));
+  //         }
+  //         else {
+  //           setDayWords(() => []);
+  //         }
+
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     };
+
+  //     fetchData();
+  //   }
+  // }, [wordSearchCounts, currentUser]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-4">
@@ -117,8 +179,8 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
           <button
             key={tab.id}
             className={`mr-4 px-4 py-2 rounded-lg ${activeTab === tab.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             onClick={() => setActiveTab(tab.id)}
           >
@@ -129,20 +191,32 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
 
       {/* 选项卡内容 */}
       <div>
-        {activeTab === 'dailyWords' && (
+        {activeTab === 'dailyQueryCount' && (
           <div>
-            <h3 className="text-lg font-semibold text-blue-500">Daily Search Words</h3>
-            <span className="text-gray-600">Total: {wordList.length}</span>
-            {/* <ul className="list-disc list-inside text-gray-600" style={{ columns: '3', columnGap: '1rem' }}> */}
-            <ul className='columns-2 md:columns-3 gap-4 list-disc list-inside text-gray-600'>
-              {wordList.map((word, index) => (
-                <li key={index}>
-                  <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
-                    {word}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="container mx-auto flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-blue-500">
+                Daily Search Count
+              </h3>
+
+              <div className="flex space-x-6">
+                <label htmlFor="xLabelsCount" className="mr-2">
+                  Show Days:
+                </label>
+                <select
+                  id="xLabelsCount"
+                  value={xLabelsCount}
+                  onChange={handleXLabelsCountChange}
+                >
+                  <option value={10}>10</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-4" style={{ overflowX: 'auto' }}> {/* 允许图表水平滚动 */}
+              <Line data={lineChartData} ref={chartRef} /> {/* 添加 ref 属性 */}
+            </div>
           </div>
         )}
 
@@ -161,36 +235,6 @@ const Statistics: React.FC<StatisticsProps> = ({ todayWords, wordSearchCounts, d
             </ul>
             <div className="mt-4">
               <Bar data={barChartData} />
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'dailyQueryCount' && (
-          <div>
-            <div className="container mx-auto flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-blue-500">
-                Daily Search Count
-              </h3>
-
-              <div className="flex space-x-6">
-                <label htmlFor="xLabelsCount" className="mr-2">
-                  Show Days:
-                </label>
-                <select
-                  id="xLabelsCount"
-                  value={xLabelsCount}
-                  onChange={handleXLabelsCountChange}
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={30}>30</option>
-                  <option value={50}>50</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-4" style={{ overflowX: 'auto' }}> {/* 允许图表水平滚动 */}
-              <Line data={lineChartData} ref={chartRef} /> {/* 添加 ref 属性 */}
             </div>
           </div>
         )}

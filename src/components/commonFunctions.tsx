@@ -3,7 +3,9 @@ import {
   get,
   runTransaction,
   orderByChild,
+  limitToFirst,
   limitToLast,
+  startAt,
   query,
 } from "firebase/database";
 import { db } from "../firebase";
@@ -147,6 +149,65 @@ export async function getTopNQueriesEfficient(
     return orderedData;
   } else {
     return null;
+  }
+}
+
+interface Cursor {
+  count: number;
+  key: string;
+}
+
+interface QueryItem {
+  count: number;
+}
+
+export async function getPaginatedTopQueriesEfficient(
+  userId: string,
+  pageSize: number,
+  cursor: Cursor | null
+): Promise<{ data: { [word: string]: number } | null, nextCursor: Cursor | null }> {
+  const allTimeRef = ref(db, `users/${userId}/allTimeQueries`);
+
+  let topQueriesQuery = query(
+    allTimeRef,
+    orderByChild("count"),
+    limitToFirst(pageSize + 1) // 多请求一个元素，以便判断是否有下一页
+  );
+
+  if (cursor) {
+    topQueriesQuery = query(
+      allTimeRef,
+      orderByChild("count"),
+      startAt(cursor.count, cursor.key),
+      limitToFirst(pageSize + 1)
+    );
+  }
+
+  const snapshot = await get(topQueriesQuery);
+
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    const keys = Object.keys(data);
+    const result: { [word: string]: number } = {};
+    const values = Object.values(data) as QueryItem[]; 
+
+    let nextCursor: Cursor | null = null;
+    if (keys.length > pageSize) {
+      // 如果结果数量超过pageSize，说明有下一页
+      nextCursor = {
+        count: values[pageSize].count,
+        key: keys[pageSize],
+      };
+      keys.pop(); // 移除最后一个元素，因为它只是用于判断是否有下一页
+    }
+
+    keys.forEach((key) => {
+      result[key] = data[key].count;
+    });
+
+    return { data: result, nextCursor };
+  } else {
+    return { data: null, nextCursor: null };
   }
 }
 

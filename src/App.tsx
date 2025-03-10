@@ -241,7 +241,6 @@ function App() {
 
         <div id="statistics">
           <Statistics
-            todayWords={todayWords}
             wordSearchCounts={wordFrequency}
             dailyWordCounts={dailyWordCounts}
             onSearch={handleSearch}
