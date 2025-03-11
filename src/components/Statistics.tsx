@@ -67,7 +67,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
     datasets: [
       {
         label: 'Query Frequency',
-        data: sortedWordFrequency.map(([, frequency]) => frequency),
+        data: sortedWordFrequency.map(([, frequency]) => frequency.count),
         backgroundColor: 'rgba(54, 162, 235, 0.8)',
       },
     ],
