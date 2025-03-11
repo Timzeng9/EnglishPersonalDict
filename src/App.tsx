@@ -13,6 +13,7 @@ import AuthForm from './components/AuthForm';
 import { format } from 'date-fns';
 import {
   isNotEnglishUnicode,
+  removeNonEnglishLetters,
   fetchWordData,
   openGoogleTranslate,
   addQueriedWord,
@@ -100,28 +101,36 @@ function App() {
       openGoogleTranslate(term);
       return;
     }
-
+    term = removeNonEnglishLetters(term);
     const wordData = await fetchWordData(term);
     if (wordData) {
       setWordData(wordData);
-      addwordFrequency(term);
-      if (!todayWords.has(term)) {
-        addDailyWordCounts(format(new Date(), 'yyyy-MM-dd'), 1);
-        addWord(term);
-      }
-
-      // 增加查询的单词到数据库
-      if (currentUser && currentUser.uid) {
-        await addQueriedWord(currentUser.uid as string, term);
-        const result = await getTopNQueriesEfficient(currentUser.uid, 15);
-        if (result) {
-          setWordFrequency(() => result);
-        }
-      }
-
     } else {
       console.log("Word not found")
-      showToast("Sorry, the word was not found.");
+      const wordData = {
+        word: term,
+        phonetic: '',
+        EnglishDefinition: [""],
+        exampleSentences: [""],
+      }
+      showToast("Sorry, the word was not found. Going to Google Translate...");
+      setWordData(wordData);
+      openGoogleTranslate(term);
+    }
+
+    addwordFrequency(term);
+    if (!todayWords.has(term)) {
+      addDailyWordCounts(format(new Date(), 'yyyy-MM-dd'), 1);
+      addWord(term);
+    }
+
+    // 增加查询的单词到数据库
+    if (currentUser && currentUser.uid) {
+      await addQueriedWord(currentUser.uid as string, term);
+      const result = await getTopNQueriesEfficient(currentUser.uid, 15);
+      if (result) {
+        setWordFrequency(() => result);
+      }
     }
 
   };

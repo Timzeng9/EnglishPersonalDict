@@ -26,8 +26,11 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
   }, [play, stop])
 
   useEffect(() => {
-    return stop
-  }, [word, stop])
+    if (word) {
+      stop();
+      play();
+    }
+  }, [word, play, stop]);
 
   const handleSubmit = (word : string) => {
     onSearch(removeNonEnglishLetters(word))

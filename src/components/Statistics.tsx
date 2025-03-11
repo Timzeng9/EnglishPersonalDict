@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,9 +13,9 @@ import {
 } from 'chart.js';
 import {
   removeNonEnglishLetters,
-  getPaginatedTopQueriesEfficient,
+  // getPaginatedTopQueriesEfficient,
 } from './commonFunctions';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 
 
 ChartJS.register(
@@ -36,7 +36,7 @@ interface StatisticsProps {
 }
 
 const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCounts, onSearch }) => {
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
   let dailyQueryCount = Array.from({ length: 5 }, (_, i) => ({
     date: `mockDay ${i + 1}`,
     count: Math.floor(Math.random() * 20) + 5, // Random count between 5 and 25
@@ -51,7 +51,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
     }
   }
 
-  let wordFrequency: { [word: string]: number } = {};
+  let wordFrequency: { [word: string]: { count: number } } = {};
   if (wordSearchCounts) {
     for (const word in wordSearchCounts) {
       wordFrequency[word] = wordSearchCounts[word];
@@ -59,7 +59,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
   }
 
   const sortedWordFrequency = Object.entries(wordFrequency)
-    .sort(([, a], [, b]) => b - a)
+    .sort(([, a], [, b]) => b.count - a.count)
     .slice(0, 15);
 
   const barChartData = {
@@ -229,7 +229,7 @@ const Statistics: React.FC<StatisticsProps> = ({ wordSearchCounts, dailyWordCoun
                 <li key={index}>
                   <span className="text-gray-600 cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleSubmit(word)}>
                     {word}
-                  </span>: {frequency}
+                  </span>: {frequency.count}
                 </li>
               ))}
             </ul>

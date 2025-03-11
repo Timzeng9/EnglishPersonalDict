@@ -9,7 +9,7 @@ import {
   query,
 } from "firebase/database";
 import { db } from "../firebase";
-import { format, subDays } from 'date-fns';
+import { format, set, subDays } from 'date-fns';
 
 export const openYouglish = (word: string) => {
   const url = `https://youglish.com/pronounce/${word}/english/us`;
@@ -22,7 +22,12 @@ export function isNotEnglishUnicode(text: string) {
 }
 
 export const openGoogleTranslate = (word: string) => {
-  const url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${word}&op=translate`;
+  // const url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${word}&op=translate`;
+  let url = `https://translate.google.com/?sl=auto&tl=zh-CN&text=${word}&op=translate`;
+  if(isNotEnglishUnicode(word))
+  {
+    url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${word}&op=translate`;
+  }
   window.open(url, '_blank');
 };
 
@@ -42,7 +47,8 @@ export const fetchWordData = async (term: string) => {
   try {
     const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${term}`);
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      // throw new Error('Network response was not ok');
+      return null;
     }
     const data = await response.json();
     if (data && data.length > 0) {
@@ -113,8 +119,18 @@ export async function addQueriedWord(userId: string, word: string) {
 
   // 3. 更新 allTimeQueries (总是更新)
   try {
-    await runTransaction(allTimeRef, (currentCount) => {
-      return (currentCount || 0) + 1;
+    await runTransaction(allTimeRef, (queryData) => {
+      if (queryData) {
+        queryData = {
+          count: (queryData.count || queryData) + 1,
+        };
+      } else {
+        // 子节点不存在，创建子节点并初始化 count
+        queryData = {
+          count: 1,
+        };
+      }
+      return queryData;
     });
   } catch (error) {
     console.error("All-time queries transaction failed:", error);
@@ -122,7 +138,6 @@ export async function addQueriedWord(userId: string, word: string) {
   }
 }
 
-// 高效获取用户查询次数最高的前 N 个单词及其次数
 export async function getTopNQueriesEfficient(
   userId: string,
   n: number
